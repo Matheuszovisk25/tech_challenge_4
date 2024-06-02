@@ -3,22 +3,38 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import requests
+from api_key import NEWS_API_KEY
+import matplotlib as plt 
+
 
 def carregar_dados(caminho_arquivo):
-    """
-    Carrega os dados de um arquivo Excel.
-
-    Parâmetros:
-    caminho_arquivo: O caminho do arquivo Excel.
-
-    Retorna:
-    DataFrame: Um DataFrame contendo os dados carregados.
-    """
     dados = pd.read_excel(caminho_arquivo, sheet_name='Planilha1')
+
+    dados = dados.loc[:, ~dados.columns.duplicated()]
+
+    if 'Preço - petróleo bruto - Brent (FOB)' in dados.columns:
+        dados = dados.rename(columns={'Preço - petróleo bruto - Brent (FOB)': 'Preco_petroleo_bruto_Brent_FOB'})
+        
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')
-    dados['Preco_petroleo_bruto_Brent_FOB'] = pd.to_numeric(dados['Preço - petróleo bruto - Brent (FOB)'], errors='coerce')
+    dados['Preco_petroleo_bruto_Brent_FOB'] = pd.to_numeric(dados['Preco_petroleo_bruto_Brent_FOB'], errors='coerce')
     return dados
 
+
+def buscar_noticias(api_key, query='petróleo', language='pt'):
+    url = f'https://newsapi.org/v2/everything?q={query}&language={language}&apiKey={api_key}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        artigos = response.json().get('articles')
+        # Filtra as notícias que mencionam petróleo no título ou na descrição
+        artigos_filtrados = [
+            artigo for artigo in artigos 
+            if ('petróleo' in artigo['title'].lower() if artigo['title'] else False) or 
+               ('petróleo' in artigo['description'].lower() if artigo['description'] else False)
+        ]
+        return artigos_filtrados
+    else:
+        return None
 
 #------------------------------------------------------INTRODUÇÃO--------------------------------------------------------------------------
 def introducao():
@@ -31,6 +47,8 @@ def introducao():
         Esta aplicação permite visualizar e analisar a evolução do preço do petróleo Brent ao longo do tempo.
         Utilize o menu para navegar entre as páginas e explorar diferentes análises.
     """)
+
+    plotar_mapa_producao()
 #------------------------------------------------------FIM INTRODUÇÃO--------------------------------------------------------------------------
 
 
@@ -60,8 +78,8 @@ def exibir(dados):
 
     submenu = option_menu(
         menu_title="",  
-        options=["Dados Brutos", "Preço ao Longo do Tempo", "Estatísticas Descritivas", "Análise de Tendências"],
-        icons=["table", "line-chart", "bar-chart", "trend-up"],
+        options=["Dados Brutos", "Preço ao Longo do Tempo", "Estatísticas Descritivas", "Análise de Tendências", "Notícias"],
+        icons=["table", "line-chart", "bar-chart", "trend-up", "newspaper"],
         menu_icon="cast",
         default_index=0,
         orientation="horizontal"
@@ -111,6 +129,18 @@ def exibir(dados):
     elif submenu == "Análise de Tendências":
         st.write("Explore as tendências nos preços do petróleo Brent.")
         plotar_analise_tendencias(dados)
+
+    elif submenu == "Notícias":
+        st.subheader("Notícias Relacionadas ao Petróleo")
+        noticias = buscar_noticias(NEWS_API_KEY)
+        if noticias:
+            for noticia in noticias:
+                st.write(f"### {noticia['title']}")
+                st.write(f"**Fonte**: {noticia['source']['name']}")
+                st.write(noticia['description'])
+                st.write(f"[Leia mais]({noticia['url']})")
+        else:
+            st.error("Não foi possível buscar as notícias. Verifique sua chave de API.")
 #------------------------------------------------------FIM EXIBIR--------------------------------------------------------------------------
 
 
@@ -306,8 +336,35 @@ def plotar_eventos_especificos(dados):
     st.plotly_chart(fig)
 
 
-#FIM DOS PLOTS
+def plotar_mapa_producao():
+    """
+    Plota um mapa dos principais produtores de petróleo em 2020.
+    """
+    produtores = pd.DataFrame({
+        'País': ['United States', 'Russia', 'Saudi Arabia', 'Canada', 'Iraq', 'China', 'United Arab Emirates', 'Brazil', 'Iran', 'Kuwait'],
+        'Produção (milhões de barris/dia)': [11.307, 9.865, 9.264, 4.201, 4.102, 3.888, 3.138, 2.939, 2.665, 2.625],
+        'Código País': ['USA', 'RUS', 'SAU', 'CAN', 'IRQ', 'CHN', 'ARE', 'BRA', 'IRN', 'KWT']
+    })
 
+    fig = px.choropleth(produtores, 
+                        locations='Código País', 
+                        color='Produção (milhões de barris/dia)',
+                        hover_name='País', 
+                        title='Principais Produtores de Petróleo (dados de 2020)',
+                        color_continuous_scale=px.colors.sequential.Plasma,
+                        projection='natural earth')
+
+    
+    fig.update_geos(showland=True, landcolor="lightgray",
+                    showcountries=True, countrycolor="Black")
+
+    st.plotly_chart(fig)
+
+    st.write("### Legenda")
+    for i in range(len(produtores)):
+        st.write(f"**{produtores['País'][i]}**: {produtores['Produção (milhões de barris/dia)'][i]:,} milhões de barris/dia")
+
+#FIM DOS PLOTS
 #------------------------------------------------------FIM PLOTS--------------------------------------------------------------------------
 
 #------------------------------------------------------INICIO QUEDAS--------------------------------------------------------------------------
@@ -396,13 +453,9 @@ def aumentos(dados):
         # Adicione análises e gráficos específicos para a Guerra do Golfo aqui
 #------------------------------------------------------FIO AUMENTOS--------------------------------------------------------------------------
 
-
 def main():
-    """
-    Função principal que configura a aplicação Streamlit e define a navegação entre as páginas.
-    """
     st.set_page_config(page_title="Análise do Preço do Petróleo Brent", layout="wide")
-    caminho_arquivo = 'petroleo.xlsx'  
+    caminho_arquivo = 'petroleo.xlsx'
     dados = carregar_dados(caminho_arquivo)
 
     with st.sidebar:
