@@ -8,6 +8,7 @@ from api_key import NEWS_API_KEY
 import matplotlib as plt 
 
 
+
 def carregar_dados(caminho_arquivo):
     dados = pd.read_excel(caminho_arquivo, sheet_name='Planilha1')
 
@@ -19,7 +20,6 @@ def carregar_dados(caminho_arquivo):
     dados['Data'] = pd.to_datetime(dados['Data'], errors='coerce')
     dados['Preco_petroleo_bruto_Brent_FOB'] = pd.to_numeric(dados['Preco_petroleo_bruto_Brent_FOB'], errors='coerce')
     return dados
-
 
 def buscar_noticias(api_key, query='petróleo', language='pt'):
     url = f'https://newsapi.org/v2/everything?q={query}&language={language}&apiKey={api_key}'
@@ -35,7 +35,7 @@ def buscar_noticias(api_key, query='petróleo', language='pt'):
         return artigos_filtrados
     else:
         return None
-
+    
 #------------------------------------------------------INTRODUÇÃO--------------------------------------------------------------------------
 def introducao():
     """
@@ -49,6 +49,8 @@ def introducao():
     """)
 
     plotar_mapa_producao()
+
+    
 #------------------------------------------------------FIM INTRODUÇÃO--------------------------------------------------------------------------
 
 
@@ -141,6 +143,7 @@ def exibir(dados):
                 st.write(f"[Leia mais]({noticia['url']})")
         else:
             st.error("Não foi possível buscar as notícias. Verifique sua chave de API.")
+    
 #------------------------------------------------------FIM EXIBIR--------------------------------------------------------------------------
 
 
@@ -303,7 +306,7 @@ def plotar_comparacao_pre_pandemia_pandemia(dados):
     st.plotly_chart(fig)
 #------------------------------------------------------FIM plotar_comparacao_pre_pandemia_pandemia--------------------------------------------------------------------------
 
-def plotar_eventos_especificos(dados):
+def plotar_eventos_vacina(dados):
     """
     Plota os impactos de eventos específicos durante a pandemia no preço do petróleo Brent.
 
@@ -328,7 +331,7 @@ def plotar_eventos_especificos(dados):
     fig.add_annotation(x='2020-12-14', y=dados_eventos['Preco_petroleo_bruto_Brent_FOB'].max(),
                        text="Início da Vacinação", showarrow=True, arrowhead=1)
 
-    fig.update_layout(title='Impacto de Eventos Específicos Durante a Pandemia no Preço do Petróleo Brent (2020-2021)',
+    fig.update_layout(title='Impacto das vacinas Durante a Pandemia no Preço do Petróleo Brent (2020-2021)',
                       xaxis_title='Data',
                       yaxis_title='Preço (USD)')
     fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines', line=dict(color='red', dash='dash'), showlegend=True, name='Início da Pandemia'))
@@ -364,6 +367,105 @@ def plotar_mapa_producao():
     for i in range(len(produtores)):
         st.write(f"**{produtores['País'][i]}**: {produtores['Produção (milhões de barris/dia)'][i]:,} milhões de barris/dia")
 
+def plotar_falencia_lehman_brothers(dados):
+    """
+    Plota o impacto da falência do Lehman Brothers no preço do petróleo Brent.
+
+    Parâmetros:
+    dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
+    """
+    st.subheader("Falência do Lehman Brothers")
+    st.write("""
+        Em 15 de setembro de 2008, o Lehman Brothers, um dos maiores bancos de investimento dos Estados Unidos, declarou falência. 
+        Este evento é frequentemente visto como o auge da crise financeira global de 2008. A falência do Lehman Brothers teve um impacto significativo 
+        nos mercados financeiros globais, incluindo o mercado de petróleo.
+    """)
+
+    dados_lehman = dados[(dados['Data'] >= '2007-01-01') & (dados['Data'] <= '2009-12-31')]
+    
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=dados_lehman['Data'], y=dados_lehman['Preco_petroleo_bruto_Brent_FOB'],
+                             mode='lines', name='Preço do Brent (FOB)',
+                             line=dict(color='blue')))
+
+    fig.add_shape(type="line",
+                  x0='2008-09-15', y0=dados_lehman['Preco_petroleo_bruto_Brent_FOB'].min(),
+                  x1='2008-09-15', y1=dados_lehman['Preco_petroleo_bruto_Brent_FOB'].max(),
+                  line=dict(color="red", width=2, dash="dash"))
+
+    fig.add_annotation(x='2008-09-15', y=dados_lehman['Preco_petroleo_bruto_Brent_FOB'].max(),
+                       text="Falência do Lehman Brothers",
+                       showarrow=True, arrowhead=1,
+                       yshift=10)
+
+    fig.update_layout(
+        title='Impacto da Falência do Lehman Brothers no Preço do Petróleo Brent (2007-2009)',
+        xaxis_title='Data',
+        yaxis_title='Preço (USD)'
+    )
+
+    st.plotly_chart(fig)
+
+    csv = dados_lehman.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados da Falência do Lehman Brothers como CSV",
+        data=csv,
+        file_name='falencia_lehman_brothers_preco_petroleo_brent.csv',
+        mime='text/csv',
+    )
+
+
+def plotar_aprovacao_tarp(dados):
+    """
+    Plota o impacto da aprovação do TARP no preço do petróleo Brent.
+
+    Parâmetros:
+    dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
+    """
+    st.subheader("Aprovação do TARP")
+    st.write("""
+        Em 3 de outubro de 2008, o governo dos Estados Unidos aprovou o Programa de Alívio de Ativos Problemáticos (TARP) para estabilizar o sistema financeiro. 
+        O TARP autorizou o Departamento do Tesouro a gastar até 700 bilhões de dólares para comprar ativos tóxicos e fornecer capital a instituições financeiras. 
+        Esta medida teve um impacto significativo nos mercados financeiros, incluindo o mercado de petróleo.
+    """)
+
+    dados_tarp = dados[(dados['Data'] >= '2007-01-01') & (dados['Data'] <= '2009-12-31')]
+    
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=dados_tarp['Data'], y=dados_tarp['Preco_petroleo_bruto_Brent_FOB'],
+                             mode='lines', name='Preço do Brent (FOB)',
+                             line=dict(color='blue')))
+
+    fig.add_shape(type="line",
+                  x0='2008-10-03', y0=dados_tarp['Preco_petroleo_bruto_Brent_FOB'].min(),
+                  x1='2008-10-03', y1=dados_tarp['Preco_petroleo_bruto_Brent_FOB'].max(),
+                  line=dict(color="green", width=2, dash="dash"))
+
+    fig.add_annotation(x='2008-10-03', y=dados_tarp['Preco_petroleo_bruto_Brent_FOB'].max(),
+                       text="Aprovação do TARP",
+                       showarrow=True, arrowhead=1,
+                       yshift=-10)
+
+    fig.update_layout(
+        title='Impacto da Aprovação do TARP no Preço do Petróleo Brent (2007-2009)',
+        xaxis_title='Data',
+        yaxis_title='Preço (USD)'
+    )
+    st.plotly_chart(fig)
+
+    csv = dados_tarp.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados da Aprovação do TARP como CSV",
+        data=csv,
+        file_name='aprovacao_tarp_preco_petroleo_brent.csv',
+        mime='text/csv',
+    )
+
+
+
+
 #FIM DOS PLOTS
 #------------------------------------------------------FIM PLOTS--------------------------------------------------------------------------
 
@@ -387,7 +489,7 @@ def quedas(dados):
 
     if submenu == "Covid-19":
         plotar_impacto_covid(dados)
-        plotar_eventos_especificos(dados)
+        plotar_eventos_vacina(dados)
         plotar_comparacao_pre_pandemia_pandemia(dados)
         
         
@@ -402,11 +504,9 @@ def quedas(dados):
         
     elif submenu == "Crise Financeira 2008":
         st.title("Crise Financeira 2008")
-        st.write("""
-            A Crise Financeira de 2008 foi uma das maiores crises econômicas globais desde a Grande Depressão. 
-            Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante esse período.
-        """)
-        # Adicione análises e gráficos específicos para a Crise Financeira de 2008 aqui
+        plotar_falencia_lehman_brothers(dados)
+        plotar_aprovacao_tarp(dados)
+        
 #------------------------------------------------------INICIO FIM--------------------------------------------------------------------------
 
 #------------------------------------------------------INICIO AUMENTOS--------------------------------------------------------------------------
@@ -477,6 +577,7 @@ def main():
         aumentos(dados)
     elif selecionado == "Conclusão":
         conclusao()
+   
 
 if __name__ == "__main__":
     main()
