@@ -200,6 +200,8 @@ def plotar_analise_tendencias(dados):
 #------------------------------------------------------FIM DADOS BRUTOS--------------------------------------------------------------------------
 
 
+
+
 #------------------------------------------------------PLOTS COVID-19--------------------------------------------------------------------------
 
 
@@ -260,7 +262,7 @@ def plotar_impacto_covid(dados):
 #------------------------------------------------------FIM plotar_impacto_covid--------------------------------------------------------------------------
 
 #------------------------------------------------------INICIO plotar_comparacao_pre_pandemia_pandemia--------------------------------------------------------------------------
-def plotar_comparacao_pre_pandemia_pandemia(dados):
+def plotar_comparacao_pre_pandemia(dados):
     """
     Plota a comparação de preços do petróleo Brent antes, durante e após a pandemia de COVID-19.
 
@@ -306,6 +308,7 @@ def plotar_comparacao_pre_pandemia_pandemia(dados):
     st.plotly_chart(fig)
 #------------------------------------------------------FIM plotar_comparacao_pre_pandemia_pandemia--------------------------------------------------------------------------
 
+#------------------------------------------------------INICIO plotar_eventos_vacina--------------------------------------------------------------------------
 def plotar_eventos_vacina(dados):
     """
     Plota os impactos de eventos específicos durante a pandemia no preço do petróleo Brent.
@@ -337,8 +340,16 @@ def plotar_eventos_vacina(dados):
     fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines', line=dict(color='red', dash='dash'), showlegend=True, name='Início da Pandemia'))
     fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines', line=dict(color='green', dash='dash'), showlegend=True, name='Início da Vacinação'))
     st.plotly_chart(fig)
+#------------------------------------------------------FIM plotar_eventos_vacina--------------------------------------------------------------------------
+
+#------------------------------------------------------FIM COVID-19--------------------------------------------------------------------------
 
 
+
+
+#------------------------------------------------------INICIO Geográficos--------------------------------------------------------------------------
+
+#------------------------------------------------------INICIO mapa_producao--------------------------------------------------------------------------
 def plotar_mapa_producao():
     """
     Plota um mapa dos principais produtores de petróleo em 2020.
@@ -366,6 +377,9 @@ def plotar_mapa_producao():
     st.write("### Legenda")
     for i in range(len(produtores)):
         st.write(f"**{produtores['País'][i]}**: {produtores['Produção (milhões de barris/dia)'][i]:,} milhões de barris/dia")
+#------------------------------------------------------FIM mapa_producao--------------------------------------------------------------------------
+
+#------------------------------------------------------FIM Geográficos--------------------------------------------------------------------------
 
 def plotar_falencia_lehman_brothers(dados):
     """
@@ -464,8 +478,6 @@ def plotar_aprovacao_tarp(dados):
     )
 
 
-
-
 #FIM DOS PLOTS
 #------------------------------------------------------FIM PLOTS--------------------------------------------------------------------------
 
@@ -490,7 +502,7 @@ def quedas(dados):
     if submenu == "Covid-19":
         plotar_impacto_covid(dados)
         plotar_eventos_vacina(dados)
-        plotar_comparacao_pre_pandemia_pandemia(dados)
+        plotar_comparacao_pre_pandemia(dados)
         
         
   
