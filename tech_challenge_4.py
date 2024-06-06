@@ -43,14 +43,8 @@ def introducao():
     """
     st.title("Introdução")
     st.write("""
-        Bem-vindo à análise do preço do petróleo Brent. 
-        Esta aplicação permite visualizar e analisar a evolução do preço do petróleo Brent ao longo do tempo.
-        Utilize o menu para navegar entre as páginas e explorar diferentes análises.
-    """)
-
-    plotar_mapa_producao()
-
-    
+        O petróleo é uma das commodities mais importantes do mundo, desempenhando um papel crucial na economia global. Ele é essencial não apenas como fonte de energia, mas também como matéria-prima para uma vasta gama de produtos, desde plásticos até produtos químicos. A produção de petróleo é, portanto, um indicador vital de poder econômico e estabilidade para muitos países.
+    """)    
 #------------------------------------------------------FIM INTRODUÇÃO--------------------------------------------------------------------------
 
 
@@ -80,8 +74,8 @@ def exibir(dados):
 
     submenu = option_menu(
         menu_title="",  
-        options=["Dados Brutos", "Preço ao Longo do Tempo", "Estatísticas Descritivas", "Análise de Tendências", "Notícias"],
-        icons=["table", "line-chart", "bar-chart", "trend-up", "newspaper"],
+        options=["Dados Brutos", "Preço ao Longo do Tempo", "Estatísticas Descritivas", "Análise de Tendências", "GeoPlot"],
+        icons=["table", "line-chart", "bar-chart", "trend-up"],
         menu_icon="cast",
         default_index=0,
         orientation="horizontal"
@@ -131,18 +125,23 @@ def exibir(dados):
     elif submenu == "Análise de Tendências":
         st.write("Explore as tendências nos preços do petróleo Brent.")
         plotar_analise_tendencias(dados)
-
-    elif submenu == "Notícias":
-        st.subheader("Notícias Relacionadas ao Petróleo")
-        noticias = buscar_noticias(NEWS_API_KEY)
-        if noticias:
-            for noticia in noticias:
-                st.write(f"### {noticia['title']}")
-                st.write(f"**Fonte**: {noticia['source']['name']}")
-                st.write(noticia['description'])
-                st.write(f"[Leia mais]({noticia['url']})")
-        else:
-            st.error("Não foi possível buscar as notícias. Verifique sua chave de API.")
+    
+    elif submenu == "GeoPlot":
+        geoplot_submenu = option_menu(
+            menu_title="GeoPlot",  
+            options=["Produção", "Exportação", "Consumo"],
+            icons=["globe", "arrow-up", "arrow-down"],
+            menu_icon="map",
+            default_index=0,
+            orientation="horizontal"
+        )
+        
+        if geoplot_submenu == "Produção":
+            plotar_mapa_producao()
+        elif geoplot_submenu == "Exportação":
+            plotar_mapa_exportacao()
+        elif geoplot_submenu == "Consumo":
+            plotar_mapa_consumo()
     
 #------------------------------------------------------FIM EXIBIR--------------------------------------------------------------------------
 
@@ -368,15 +367,66 @@ def plotar_mapa_producao():
                         color_continuous_scale=px.colors.sequential.Plasma,
                         projection='natural earth')
 
-    
     fig.update_geos(showland=True, landcolor="lightgray",
                     showcountries=True, countrycolor="Black")
 
     st.plotly_chart(fig)
 
     st.write("### Legenda")
-    for i in range(len(produtores)):
-        st.write(f"**{produtores['País'][i]}**: {produtores['Produção (milhões de barris/dia)'][i]:,} milhões de barris/dia")
+    st.table(produtores[['País', 'Produção (milhões de barris/dia)','Código País']])
+
+def plotar_mapa_exportacao():
+    """
+    Plota um mapa dos principais exportadores de petróleo em 2018.
+    """
+    exportadores = pd.DataFrame({
+        'País': ['Saudi Arabia', 'Russia', 'Iraq', 'United States', 'Canada', 'United Arab Emirates', 'Kuwait', 'Nigeria', 'Qatar', 'Angola'],
+        'Exportação (milhões de barris/dia)': [10.600, 5.225, 3.800, 3.770, 3.596, 2.296, 2.050, 1.979, 1.477, 1.420],
+        'Código País': ['SAU', 'RUS', 'IRQ', 'USA', 'CAN', 'ARE', 'KWT', 'NGA', 'QAT', 'AGO']
+    })
+
+    fig = px.choropleth(exportadores, 
+                        locations='Código País', 
+                        color='Exportação (milhões de barris/dia)',
+                        hover_name='País', 
+                        title='Principais Exportadores de Petróleo (dados de 2018)',
+                        color_continuous_scale=px.colors.sequential.Plasma,
+                        projection='natural earth')
+
+    fig.update_geos(showland=True, landcolor="lightgray",
+                    showcountries=True, countrycolor="Black")
+
+    st.plotly_chart(fig)
+
+    st.write("### Legenda")
+    st.table(exportadores[['País', 'Exportação (milhões de barris/dia)']])
+
+def plotar_mapa_consumo():
+    """
+    Plota um mapa dos principais consumidores de petróleo em 2019.
+    """
+    consumidores = pd.DataFrame({
+        'País': ['United States', 'China', 'India', 'Japan', 'Saudi Arabia', 'Russia', 'South Korea', 'Canada', 'Brazil', 'Germany'],
+        'Consumo (milhões de barris/dia)': [19.400, 14.056, 5.271, 3.812, 3.788, 3.317, 2.760, 2.403, 2.398, 2.281],
+        'Código País': ['USA', 'CHN', 'IND', 'JPN', 'SAU', 'RUS', 'KOR', 'CAN', 'BRA', 'DEU']
+    })
+
+    fig = px.choropleth(consumidores, 
+                        locations='Código País', 
+                        color='Consumo (milhões de barris/dia)',
+                        hover_name='País', 
+                        title='Principais Consumidores de Petróleo (dados de 2019)',
+                        color_continuous_scale=px.colors.sequential.Plasma,
+                        projection='natural earth')
+
+    fig.update_geos(showland=True, landcolor="lightgray",
+                    showcountries=True, countrycolor="Black")
+
+    st.plotly_chart(fig)
+
+    st.write("### Legenda")
+    st.table(consumidores[['País', 'Consumo (milhões de barris/dia)']])
+
 #------------------------------------------------------FIM mapa_producao--------------------------------------------------------------------------
 
 #------------------------------------------------------FIM Geográficos--------------------------------------------------------------------------
@@ -573,8 +623,8 @@ def main():
     with st.sidebar:
         selecionado = option_menu(
             menu_title="Menu Principal",  
-            options=["Introdução", "Dados Brutos", "Quedas", "Aumentos", "Conclusão"],  
-            icons=["info-circle", "database", "arrow-down", "arrow-up", "check"],  
+            options=["Introdução", "Dados Brutos", "Quedas", "Aumentos", "Notícias", "Conclusão"],  
+            icons=["info-circle", "database", "arrow-down", "arrow-up", "newspaper", "check"],  
             menu_icon="cast",  
             default_index=0,  
         )
@@ -587,6 +637,17 @@ def main():
         quedas(dados)
     elif selecionado == "Aumentos":
         aumentos(dados)
+    elif selecionado == "Notícias":
+        st.subheader("Notícias Relacionadas ao Petróleo")
+        noticias = buscar_noticias(NEWS_API_KEY)
+        if noticias:
+            for noticia in noticias:
+                st.write(f"### {noticia['title']}")
+                st.write(f"**Fonte**: {noticia['source']['name']}")
+                st.write(noticia['description'])
+                st.write(f"[Leia mais]({noticia['url']})")
+        else:
+            st.error("Não foi possível buscar as notícias. Verifique sua chave de API.")
     elif selecionado == "Conclusão":
         conclusao()
    
