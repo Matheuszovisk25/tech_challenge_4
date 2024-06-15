@@ -37,14 +37,79 @@ def buscar_noticias(api_key, query='petróleo', language='pt'):
         return None
     
 #------------------------------------------------------INTRODUÇÃO--------------------------------------------------------------------------
-def introducao():
+def introducao(dados):
     """
     Exibe a introdução da aplicação.
     """
     st.title("Introdução")
-    st.write("""
-        O petróleo é uma das commodities mais importantes do mundo, desempenhando um papel crucial na economia global. Ele é essencial não apenas como fonte de energia, mas também como matéria-prima para uma vasta gama de produtos, desde plásticos até produtos químicos. A produção de petróleo é, portanto, um indicador vital de poder econômico e estabilidade para muitos países.
-    """)    
+    st.write(""" O petróleo é uma das commodities mais importantes do mundo, desempenhando um papel crucial na economia global. Ele é essencial não apenas como fonte de energia, mas também como matéria-prima para uma vasta gama de produtos, desde plásticos até produtos químicos. A produção de petróleo é, portanto, um indicador vital de poder econômico e estabilidade para muitos países.\n   
+    A extração do petróleo envolve uma técnica de detonação de rochas com uma carga explosiva a uma profundidade específica, afim de identificar potencial reservas.\n
+    Com essa matéria prima é possível produzir diversos produtos essenciais como:\b
+    - Combustível: gasolina, disel e querosene\b
+    - Lubrificante: óleo e graxas\b
+    - Materiais: plásticos, asfalto e fibras sintéticas\b
+    - Produtos Químicos: solventes e fertilizantes""")    
+    st.write(""" Para poder medir a quantidade de extração dessa material é utilizada uma medida comumente usada na indústria petrolífera para quantificar o volume de petrólio bruto, sendo essa unidade chamada que "barril de petróleo" que equivale a 159 litros. Contudo a conversão exata de 1 barril é de 42 galões americanos que é exatamente 3,78541 litros. \n
+    Portanto o cálculo é exatamente 42 galões americanos x 3,78541 litros = galão 159 litros.""")
+    st.write(""" Para promover a elaboração de políticas sólidas, mercados eficientes e a compreensão pública da energia e da sua interação com a economia e o ambiente, a instituição "EIA.gov" recolhe, analisa e divulga informações energéticas e disponibiliza em seu site com ampla gama de informações como produção de energia, estoques, demanda, importações, exportações e preços que é o assunto principal da nossa consultoria.\n
+    Nossos dashboard é interativo com insights relevantes para colaborar na tomada de decisão com a análise do preço petróleo brent, além de nosso modelo de Machine Learning com o Forecasting dos custos com base no histórico de preços apresentado no site EIA.gov "Energy Information Administration.\n
+    Para facilitar na compreensão da nossa consultoria apresentarmos-ei os momentos das crises econômicas e as demandas globais do petróleo que diretamente influenciam na alta e baixa dos custos referente ao barril.""")
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=dados['Data'], y=dados['Preco_petroleo_bruto_Brent_FOB'], mode='lines', name='Preço do Brent (FOB)', line=dict(color='blue')))
+
+    # Anotações para eventos importantes
+    eventos = [
+        {'data': '1990-08-02', 'evento': 'Guerra do Golfo', 'cor': 'red'},
+        {'data': '2008-09-15', 'evento': 'Crise do Subprime', 'cor': 'orange'},
+        {'data': '2010-12-17', 'evento': 'Primavera Árabe', 'cor': 'green'},
+        {'data': '2020-03-11', 'evento': 'Pandemia de COVID-19', 'cor': 'purple'}
+    ]
+
+    for evento in eventos:
+        fig.add_shape(
+            type="line",
+            x0=evento['data'], y0=dados['Preco_petroleo_bruto_Brent_FOB'].min(),
+            x1=evento['data'], y1=dados['Preco_petroleo_bruto_Brent_FOB'].max(),
+            line=dict(color=evento['cor'], width=2, dash="dash")
+        )
+        fig.add_annotation(
+            x=evento['data'], y=dados['Preco_petroleo_bruto_Brent_FOB'].max(),
+            ax=0, ay=-30,
+            text=evento['evento'], showarrow=True, arrowhead=2,
+            arrowcolor=evento['cor'], arrowsize=1, arrowwidth=2,
+            font=dict(color=evento['cor'], size=12),
+            textangle=-45
+        )
+
+    # Adicionando trace para cada evento para incluir na legenda
+    for evento in eventos:
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='lines',
+            line=dict(color=evento['cor'], dash='dash'),
+            showlegend=True,
+            name=evento['evento']
+        ))
+
+    fig.update_layout(
+        title='Evolução dos Preços do Petróleo',
+        xaxis_title='Data',
+        yaxis_title='Preço (USD)',
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.3,
+            xanchor="center",
+            x=0.5
+        ),
+        margin=dict(b=100)  # Margem inferior para espaço das legendas
+    )
+
+    st.plotly_chart(fig)
+
 #------------------------------------------------------FIM INTRODUÇÃO--------------------------------------------------------------------------
 
 
@@ -55,9 +120,11 @@ def conclusao():
     """
     st.title("Conclusão")
     st.write("""
-        Obrigado por usar nossa aplicação para analisar os preços do petróleo Brent.
-        Esperamos que tenha encontrado as informações úteis.
-        Se tiver alguma dúvida ou sugestão, por favor, entre em contato.
+        Obrigado por usar nossa aplicação para analisar os preços do petróleo Brent,
+        esperamos que tenha encontrado as informações úteis.
+        Se tiver alguma dúvida ou sugestão, por favor, entre em contato.\n
+        O petróleo é um recurso natural de extrema importância, tanto histórica quanto economicamente, mas que também apresenta grandes desafios ambientais. 
+        O futuro da energia deve equilibrar a demanda por combustíveis com a necessidade de práticas sustentáveis.
     """)
 #------------------------------------------------------FIM CONCLUSÃO--------------------------------------------------------------------------
 
@@ -180,7 +247,7 @@ def plotar_evolucao_preco_interativo(dados, data_inicio, data_fim):
 #------------------------------------------------------INICIO plotar_analise_tendencias--------------------------------------------------------------------------
 def plotar_analise_tendencias(dados):
     """
-    Plota a análise de tendências nos preços do petróleo Brent utilizando médias móveis gerais.
+    Plota a análise de tendências nos preços do petróleo Brent utilizando médias móveis e permite o download dos dados.
 
     Parâmetros:
     dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
@@ -188,12 +255,38 @@ def plotar_analise_tendencias(dados):
     st.subheader("Análise de Tendências")
     st.write("Explore as tendências nos preços do petróleo Brent.")
 
-    dados['Media_Movel_Geral'] = dados['Preco_petroleo_bruto_Brent_FOB'].expanding().mean()
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=dados['Data'], y=dados['Preco_petroleo_bruto_Brent_FOB'], mode='lines', name='Preço do Brent (FOB)'))
-    fig.add_trace(go.Scatter(x=dados['Data'], y=dados['Media_Movel_Geral'], mode='lines', name='Média Móvel Geral'))
-    fig.update_layout(title='Tendências nos Preços do Petróleo Brent', xaxis_title='Data', yaxis_title='Preço (USD)')
-    st.plotly_chart(fig)
+    # Correção da Média Móvel
+    dados['Media_Movel_30'] = dados['Preco_petroleo_bruto_Brent_FOB'].rolling(window=30).mean()
+
+    st.write("Selecione um intervalo de datas para visualizar a análise de tendências.")
+    data_min = dados['Data'].min().date()
+    data_max = dados['Data'].max().date()
+
+    data_inicio, data_fim = st.slider("Selecione o intervalo de datas", min_value=data_min, max_value=data_max, value=(data_min, data_max), format="DD/MM/YYYY")
+
+    if data_inicio > data_fim:
+        st.error("Data de início não pode ser maior que a data de fim.")
+    else:
+        dados_filtrados = dados[(dados['Data'] >= pd.to_datetime(data_inicio)) & (dados['Data'] <= pd.to_datetime(data_fim))]
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Preco_petroleo_bruto_Brent_FOB'], mode='lines', name='Preço do Brent (FOB)'))
+        fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Media_Movel_30'], mode='lines', name='Média Móvel 30 Dias'))
+
+        fig.update_layout(title='Análise de Tendências nos Preços do Petróleo Brent',
+                          xaxis_title='Data',
+                          yaxis_title='Preço (USD)')
+
+        st.plotly_chart(fig)
+
+        # Botão para baixar os dados filtrados
+        csv = dados_filtrados.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Baixar dados como CSV",
+            data=csv,
+            file_name='analise_tendencias_preco_petroleo_brent.csv',
+            mime='text/csv',
+        )
 #------------------------------------------------------FIM plotar_analise_tendencias--------------------------------------------------------------------------
 
 #------------------------------------------------------FIM DADOS BRUTOS--------------------------------------------------------------------------
@@ -262,12 +355,6 @@ def plotar_impacto_covid(dados):
 
 #------------------------------------------------------INICIO plotar_comparacao_pre_pandemia_pandemia--------------------------------------------------------------------------
 def plotar_comparacao_pre_pandemia(dados):
-    """
-    Plota a comparação de preços do petróleo Brent antes, durante e após a pandemia de COVID-19.
-
-    Parâmetros:
-    dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
-    """
     st.subheader("Comparação de Preços Antes, Durante e Pós-Pandemia")
     st.write("""
         Este gráfico compara os preços do petróleo Brent em três períodos distintos: antes da pandemia (2019), durante a pandemia (2020) e pós-pandemia (2021). 
@@ -315,6 +402,24 @@ def plotar_eventos_vacina(dados):
     Parâmetros:
     dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
     """
+
+    st.subheader("Impacto de Eventos Específicos Durante a Pandemia")
+    st.write("""
+        Durante a pandemia de COVID-19, vários eventos específicos tiveram um impacto significativo nos preços do petróleo Brent. 
+        Dois dos eventos mais marcantes foram o início dos lockdowns em março de 2020 e o início da vacinação em dezembro de 2020.
+
+        **Início dos Lockdowns (Março de 2020):**
+        Em 11 de março de 2020, a Organização Mundial da Saúde (OMS) declarou o COVID-19 como uma pandemia global. 
+        Isso levou a uma série de lockdowns em vários países ao redor do mundo, resultando em uma drástica redução na demanda por petróleo. 
+        O gráfico a seguir mostra uma queda acentuada nos preços do petróleo Brent imediatamente após esse anúncio, refletindo a incerteza e a contração econômica global.
+
+        **Início da Vacinação (Dezembro de 2020):**
+        Com o desenvolvimento rápido das vacinas contra o COVID-19, a vacinação em massa começou em muitos países em dezembro de 2020. 
+        Este evento marcou o início de uma recuperação econômica gradual, aumentando as esperanças de um retorno à normalidade. 
+        O gráfico mostra uma recuperação nos preços do petróleo Brent à medida que a confiança dos investidores começou a retornar com o progresso das campanhas de vacinação.
+
+        Este gráfico detalha as flutuações nos preços do petróleo Brent durante esses eventos críticos, destacando a volatilidade do mercado em resposta às mudanças globais.
+    """)
     dados_eventos = dados[(dados['Data'] >= '2020-01-01') & (dados['Data'] <= '2021-12-31')]
     
     fig = go.Figure()
@@ -527,7 +632,35 @@ def plotar_aprovacao_tarp(dados):
         mime='text/csv',
     )
 
+def plotar_volatilidade(dados):
+    """
+    Plota a volatilidade dos preços do petróleo Brent durante a Crise Financeira de 2008.
 
+    Parâmetros:
+    dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
+    """
+    st.subheader("Volatilidade dos Preços do Petróleo")
+    st.write("""
+        A volatilidade dos preços do petróleo aumentou significativamente durante a Crise Financeira de 2008.
+        Isso reflete a incerteza e o pânico no mercado à medida que os preços do petróleo flutuavam drasticamente.
+    """)
+
+    dados_volatilidade = dados[(dados['Data'] >= '2007-01-01') & (dados['Data'] <= '2009-12-31')]
+    dados_volatilidade['Retornos Diários'] = dados_volatilidade['Preco_petroleo_bruto_Brent_FOB'].pct_change()
+    dados_volatilidade['Volatilidade'] = dados_volatilidade['Retornos Diários'].rolling(window=30).std()
+
+    fig = px.line(dados_volatilidade, x='Data', y='Volatilidade', title='Volatilidade dos Preços do Petróleo Brent (2007-2009)')
+    fig.update_xaxes(title_text='Data')
+    fig.update_yaxes(title_text='Volatilidade (30 dias)')
+    st.plotly_chart(fig)
+
+    csv = dados_volatilidade[['Data', 'Volatilidade']].dropna().to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados de Volatilidade como CSV",
+        data=csv,
+        file_name='volatilidade_preco_petroleo_brent.csv',
+        mime='text/csv',
+    )
 #FIM DOS PLOTS
 #------------------------------------------------------FIM PLOTS--------------------------------------------------------------------------
 
@@ -542,8 +675,8 @@ def quedas(dados):
     st.title("Análise do Preço do Petróleo Brent")
     submenu = option_menu(
         menu_title="",  
-        options=["Covid-19", "Crise dos Tigres Asiáticos", "Crise Financeira 2008"],
-        icons=["virus", "chart-line", "money-bill-wave"],
+        options=["Covid-19", "Crise Financeira 2008"],
+        icons=["virus", "dropbox"],
         menu_icon="cast",
         default_index=0,
         orientation="horizontal"
@@ -555,20 +688,11 @@ def quedas(dados):
         plotar_comparacao_pre_pandemia(dados)
         
         
-  
-    elif submenu == "Crise dos Tigres Asiáticos":
-        st.title("Crise dos Tigres Asiáticos")
-        st.write("""
-            A Crise dos Tigres Asiáticos em 1997-1998 foi uma grande crise financeira que afetou muitos países do Sudeste Asiático. 
-            Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante esse período.
-        """)
-        # Adicione análises e gráficos específicos para a Crise dos Tigres Asiáticos aqui
-        
     elif submenu == "Crise Financeira 2008":
         st.title("Crise Financeira 2008")
         plotar_falencia_lehman_brothers(dados)
         plotar_aprovacao_tarp(dados)
-        
+        plotar_volatilidade(dados)
 #------------------------------------------------------INICIO FIM--------------------------------------------------------------------------
 
 #------------------------------------------------------INICIO AUMENTOS--------------------------------------------------------------------------
@@ -582,8 +706,8 @@ def aumentos(dados):
     st.title("Análise do Preço do Petróleo Brent")
     submenu = option_menu(
         menu_title="",  
-        options=["Primavera Árabe", "Revolução Iraniana", "Guerra do Golfo"],
-        icons=["globe", "flag", "fighter-jet"],
+        options=["Primavera Árabe","Guerra do Golfo"],
+        icons=["globe", "peace"],
         menu_icon="cast",
         default_index=0,
         orientation="horizontal"
@@ -597,14 +721,6 @@ def aumentos(dados):
             Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante esse período.
         """)
         # Adicione análises e gráficos específicos para a Primavera Árabe aqui
-
-    elif submenu == "Revolução Iraniana":
-        st.title("Revolução Iraniana")
-        st.write("""
-            A Revolução Iraniana de 1979 levou a uma grande interrupção na produção de petróleo, causando um aumento acentuado nos preços globais do petróleo. 
-            Esta seção examina as flutuações de preço durante e após a revolução.
-        """)
-        # Adicione análises e gráficos específicos para a Revolução Iraniana aqui
 
     elif submenu == "Guerra do Golfo":
         st.title("Guerra do Golfo")
@@ -630,7 +746,7 @@ def main():
         )
 
     if selecionado == "Introdução":
-        introducao()
+        introducao(dados)
     elif selecionado == "Dados Brutos":
         exibir(dados)
     elif selecionado == "Quedas":
