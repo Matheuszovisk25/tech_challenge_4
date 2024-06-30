@@ -8,7 +8,6 @@ from api_key import NEWS_API_KEY
 import matplotlib as plt 
 
 
-
 def carregar_dados(caminho_arquivo):
     dados = pd.read_excel(caminho_arquivo, sheet_name='Planilha1')
 
@@ -59,7 +58,6 @@ def introducao(dados):
 
     fig.add_trace(go.Scatter(x=dados['Data'], y=dados['Preco_petroleo_bruto_Brent_FOB'], mode='lines', name='Preço do Brent (FOB)', line=dict(color='blue')))
 
-    # Anotações para eventos importantes
     eventos = [
         {'data': '1990-08-02', 'evento': 'Guerra do Golfo', 'cor': 'red'},
         {'data': '2008-09-15', 'evento': 'Crise do Subprime', 'cor': 'orange'},
@@ -83,7 +81,6 @@ def introducao(dados):
             textangle=-45
         )
 
-    # Adicionando trace para cada evento para incluir na legenda
     for evento in eventos:
         fig.add_trace(go.Scatter(
             x=[None], y=[None],
@@ -105,7 +102,7 @@ def introducao(dados):
             xanchor="center",
             x=0.5
         ),
-        margin=dict(b=100)  # Margem inferior para espaço das legendas
+        margin=dict(b=100) 
     )
 
     st.plotly_chart(fig)
@@ -120,12 +117,16 @@ def conclusao():
     """
     st.title("Conclusão")
     st.write("""
-        Obrigado por usar nossa aplicação para analisar os preços do petróleo Brent,
-        esperamos que tenha encontrado as informações úteis.
+        Obrigado por usar nossa aplicação para analisar os preços do petróleo Brent, esperamos que tenha encontrado as informações úteis.\b
         Se tiver alguma dúvida ou sugestão, por favor, entre em contato.\n
-        O petróleo é um recurso natural de extrema importância, tanto histórica quanto economicamente, mas que também apresenta grandes desafios ambientais. 
-        O futuro da energia deve equilibrar a demanda por combustíveis com a necessidade de práticas sustentáveis.
-    """)
+        O petróleo é um recurso natural de extrema importância, tanto histórica quanto economicamente, mas que também apresenta grandes desafios ambientais.\b 
+        O futuro da energia deve equilibrar a demanda por combustíveis com a necessidade de práticas sustentáveis.\n
+        Fatores como geopolítica, crises econômicas, demanda global por energia e outras situações influenciam no preço do barril do petróleo. Com dados histórico é possível criar uma análise e ter insights, afim de poder avaliar e escolher a melhor resolução para deliberação financeiras dentro de uma empresa.\n 
+        A Guerra do Golfo de 1990-1991 não só alterou drasticamente o cenário político e econômico do Oriente Médio, mas também teve implicações globais significativas, desde o impacto sobre os preços do petróleo até mudanças nas políticas de segurança internacional. O conflito exemplificou as complexidades das relações internacionais e a volatilidade das questões de energia e soberania no mundo contemporâneo.\n        
+        A Revolução Iraniana de 1979 não apenas transformou o Irã, mas também teve um impacto profundo e duradouro no mercado global de petróleo, nas relações internacionais e na geopolítica do Oriente Médio. A crise resultante sublinhou a importância da estabilidade regional e a vulnerabilidade das economias globais às flutuações nos mercados de energia, destacando a interconexão entre política, economia e recursos naturais no mundo contemporâneo.\n
+        A Primavera Árabe teve um impacto profundo e duradouro no mercado de petróleo e na geopolítica do Oriente Médio e do Norte da África. As interrupções na produção e os aumentos nos preços do petróleo destacaram a vulnerabilidade da economia global às crises regionais em áreas ricas em recursos energéticos. Esse período tumultuado sublinhou a necessidade de diversificação energética e de investimentos em infraestrutura para mitigar os riscos associados à dependência do petróleo de regiões instáveis.\n
+        
+        """)
 #------------------------------------------------------FIM CONCLUSÃO--------------------------------------------------------------------------
 
 
@@ -246,17 +247,13 @@ def plotar_evolucao_preco_interativo(dados, data_inicio, data_fim):
 
 #------------------------------------------------------INICIO plotar_analise_tendencias--------------------------------------------------------------------------
 def plotar_analise_tendencias(dados):
-    """
-    Plota a análise de tendências nos preços do petróleo Brent utilizando médias móveis e permite o download dos dados.
-
-    Parâmetros:
-    dados (DataFrame): O DataFrame contendo os dados do preço do petróleo.
-    """
     st.subheader("Análise de Tendências")
     st.write("Explore as tendências nos preços do petróleo Brent.")
 
-    # Correção da Média Móvel
     dados['Media_Movel_30'] = dados['Preco_petroleo_bruto_Brent_FOB'].rolling(window=30).mean()
+    dados['Media_Movel_90'] = dados['Preco_petroleo_bruto_Brent_FOB'].rolling(window=90).mean()
+    dados['Media_Movel_365'] = dados['Preco_petroleo_bruto_Brent_FOB'].rolling(window=365).mean()
+    dados['Media_Geral'] = dados['Preco_petroleo_bruto_Brent_FOB'].mean()
 
     st.write("Selecione um intervalo de datas para visualizar a análise de tendências.")
     data_min = dados['Data'].min().date()
@@ -269,9 +266,24 @@ def plotar_analise_tendencias(dados):
     else:
         dados_filtrados = dados[(dados['Data'] >= pd.to_datetime(data_inicio)) & (dados['Data'] <= pd.to_datetime(data_fim))]
 
+        medias_moveis = st.multiselect('Selecione as médias móveis que deseja visualizar:',
+                                       ['Média Móvel 30 Dias', 'Média Móvel 90 Dias', 'Média Móvel 365 Dias', 'Média Geral'],
+                                       default=['Média Móvel 30 Dias', 'Média Móvel 90 Dias', 'Média Móvel 365 Dias', 'Média Geral'])
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Preco_petroleo_bruto_Brent_FOB'], mode='lines', name='Preço do Brent (FOB)'))
-        fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Media_Movel_30'], mode='lines', name='Média Móvel 30 Dias'))
+        
+        if 'Média Móvel 30 Dias' in medias_moveis:
+            fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Media_Movel_30'], mode='lines', name='Média Móvel 30 Dias'))
+        
+        if 'Média Móvel 90 Dias' in medias_moveis:
+            fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Media_Movel_90'], mode='lines', name='Média Móvel 90 Dias'))
+        
+        if 'Média Móvel 365 Dias' in medias_moveis:
+            fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Media_Movel_365'], mode='lines', name='Média Móvel 365 Dias'))
+        
+        if 'Média Geral' in medias_moveis:
+            fig.add_trace(go.Scatter(x=dados_filtrados['Data'], y=dados_filtrados['Media_Geral'], mode='lines', name='Média Geral', line=dict(dash='dash')))
 
         fig.update_layout(title='Análise de Tendências nos Preços do Petróleo Brent',
                           xaxis_title='Data',
@@ -279,7 +291,6 @@ def plotar_analise_tendencias(dados):
 
         st.plotly_chart(fig)
 
-        # Botão para baixar os dados filtrados
         csv = dados_filtrados.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="Baixar dados como CSV",
@@ -287,6 +298,7 @@ def plotar_analise_tendencias(dados):
             file_name='analise_tendencias_preco_petroleo_brent.csv',
             mime='text/csv',
         )
+
 #------------------------------------------------------FIM plotar_analise_tendencias--------------------------------------------------------------------------
 
 #------------------------------------------------------FIM DADOS BRUTOS--------------------------------------------------------------------------
@@ -536,6 +548,9 @@ def plotar_mapa_consumo():
 
 #------------------------------------------------------FIM Geográficos--------------------------------------------------------------------------
 
+
+#------------------------------------------------------INICIO CRISE 2008--------------------------------------------------------------------------
+
 def plotar_falencia_lehman_brothers(dados):
     """
     Plota o impacto da falência do Lehman Brothers no preço do petróleo Brent.
@@ -661,6 +676,41 @@ def plotar_volatilidade(dados):
         file_name='volatilidade_preco_petroleo_brent.csv',
         mime='text/csv',
     )
+
+
+
+def plotar_comparacao_prepos_primavera_arabe(dados):
+    st.subheader("Comparação de Preços Antes e Depois da Primavera Árabe")
+    st.write("""
+        Este gráfico compara os preços do petróleo Brent antes, durante e depois da Primavera Árabe, destacando o impacto dos eventos nos preços.
+    """)
+
+    pre_arabe = dados[(dados['Data'] >= '2008-01-01') & (dados['Data'] < '2010-01-01')]
+    durante_arabe = dados[(dados['Data'] >= '2010-01-01') & (dados['Data'] < '2012-01-01')]
+    pos_arabe = dados[(dados['Data'] >= '2012-01-01') & (dados['Data'] <= '2014-12-31')]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Box(y=pre_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Antes da Primavera Árabe', marker_color='blue'))
+    fig.add_trace(go.Box(y=durante_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Durante a Primavera Árabe', marker_color='red'))
+    fig.add_trace(go.Box(y=pos_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Após a Primavera Árabe', marker_color='green'))
+
+    fig.update_layout(
+        title='Comparação de Preços do Petróleo Brent Antes, Durante e Após a Primavera Árabe',
+        yaxis_title='Preço (USD)',
+        boxmode='group'
+    )
+
+    st.plotly_chart(fig)
+
+    dados_comparacao = pd.concat([pre_arabe, durante_arabe, pos_arabe])
+    csv = dados_comparacao.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name='comparacao_prepos_primavera_arabe.csv',
+        mime='text/csv',
+    )
 #FIM DOS PLOTS
 #------------------------------------------------------FIM PLOTS--------------------------------------------------------------------------
 
@@ -693,6 +743,261 @@ def quedas(dados):
         plotar_falencia_lehman_brothers(dados)
         plotar_aprovacao_tarp(dados)
         plotar_volatilidade(dados)
+
+#------------------------------------------------------FIM CRISE 2008--------------------------------------------------------------------------
+
+#------------------------------------------------------INICIO PRIMAVERA ARÁBE--------------------------------------------------------------------------
+
+
+def plotar_primavera_arabe(dados):
+    st.subheader("Impacto da Primavera Árabe no Preço do Petróleo Brent")
+    st.write("""
+        A Primavera Árabe foi uma série de protestos e levantes que ocorreram no Oriente Médio e no Norte da África a partir de 2010.
+        Esses eventos tiveram um impacto significativo no mercado global de petróleo, causando aumentos nos preços devido à instabilidade política.
+    """)
+
+    dados_arabe = dados[(dados['Data'] >= '2010-01-01') & (dados['Data'] <= '2013-12-31')]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=dados_arabe['Data'], y=dados_arabe['Preco_petroleo_bruto_Brent_FOB'],
+                             mode='lines', name='Preço do Brent (FOB)', line=dict(color='blue')))
+
+    eventos = [
+        {'data': '2010-12-17', 'evento': 'Início dos Protestos na Tunísia', 'cor': 'red'},
+        {'data': '2011-02-11', 'evento': 'Queda do Governo no Egito', 'cor': 'green'},
+        {'data': '2011-10-20', 'evento': 'Queda do Governo na Líbia', 'cor': 'purple'}
+    ]
+
+    for evento in eventos:
+        fig.add_shape(
+            type="line",
+            x0=evento['data'], y0=dados_arabe['Preco_petroleo_bruto_Brent_FOB'].min(),
+            x1=evento['data'], y1=dados_arabe['Preco_petroleo_bruto_Brent_FOB'].max(),
+            line=dict(color=evento['cor'], width=2, dash="dash")
+        )
+        fig.add_annotation(
+            x=evento['data'], y=dados_arabe['Preco_petroleo_bruto_Brent_FOB'].max(),
+            ax=0, ay=-30,
+            text=evento['evento'], showarrow=True, arrowhead=2,
+            arrowcolor=evento['cor'], arrowsize=1, arrowwidth=2,
+            font=dict(color=evento['cor'], size=12),
+            textangle=-45
+        )
+
+    for evento in eventos:
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='lines',
+            line=dict(color=evento['cor'], dash='dash'),
+            showlegend=True,
+            name=evento['evento']
+        ))
+
+    fig.update_layout(
+        title='Impacto da Primavera Árabe no Preço do Petróleo Brent',
+        xaxis_title='Data',
+        yaxis_title='Preço (USD)',
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            itemwidth=50,  
+            font=dict(size=10)
+        ),
+        margin=dict(b=100)  
+    )
+
+    st.plotly_chart(fig)
+
+    csv = dados_arabe.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name='impacto_primavera_arabe_preco_petroleo_brent.csv',
+        mime='text/csv',
+    )
+
+def plotar_comparacao_prepos_primavera_arabe(dados):
+    st.subheader("Comparação de Preços Antes e Depois da Primavera Árabe")
+    st.write("""
+        Este gráfico compara os preços do petróleo Brent antes, durante e depois da Primavera Árabe, destacando o impacto dos eventos nos preços.
+    """)
+
+    
+    pre_arabe = dados[(dados['Data'] >= '2008-01-01') & (dados['Data'] < '2010-01-01')]
+    durante_arabe = dados[(dados['Data'] >= '2010-01-01') & (dados['Data'] < '2012-01-01')]
+    pos_arabe = dados[(dados['Data'] >= '2012-01-01') & (dados['Data'] <= '2014-12-31')]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Box(y=pre_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Antes da Primavera Árabe (2008-2009)', marker_color='blue'))
+    fig.add_trace(go.Box(y=durante_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Durante a Primavera Árabe (2010-2011)', marker_color='red'))
+    fig.add_trace(go.Box(y=pos_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Após a Primavera Árabe (2012-2014)', marker_color='green'))
+
+    fig.update_layout(
+        title='Comparação de Preços do Petróleo Brent Antes, Durante e Após a Primavera Árabe',
+        yaxis_title='Preço (USD)',
+        boxmode='group'
+    )
+
+    st.plotly_chart(fig)
+
+    dados_comparacao = pd.concat([pre_arabe, durante_arabe, pos_arabe])
+    csv = dados_comparacao.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name='comparacao_prepos_primavera_arabe.csv',
+        mime='text/csv',
+    )
+
+def plotar_dispersao_retornos(dados):
+    st.subheader("Dispersão dos Retornos Diários do Preço do Petróleo Brent (2009-2014)")
+    st.write("""
+        Este gráfico mostra a dispersão dos retornos diários do preço do petróleo Brent, destacando a volatilidade durante o período de 2009 a 2014.
+    """)
+
+    
+    dados_filtrados = dados[(dados['Data'] >= '2009-01-01') & (dados['Data'] <= '2014-12-31')]
+    dados_filtrados['Retornos_Diarios'] = dados_filtrados['Preco_petroleo_bruto_Brent_FOB'].pct_change()
+
+    fig = px.scatter(dados_filtrados, x='Data', y='Retornos_Diarios', title='Dispersão dos Retornos Diários do Preço do Petróleo Brent (2009-2014)', color='Retornos_Diarios', labels={'Retornos_Diarios': 'Retornos Diários'})
+    fig.update_layout(xaxis_title='Data', yaxis_title='Retornos Diários')
+    st.plotly_chart(fig)
+
+    
+    csv = dados_filtrados[['Data', 'Retornos_Diarios']].dropna().to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name='dispersao_retornos_2009_2014.csv',
+        mime='text/csv',
+    )
+
+
+#------------------------------------------------------FIM PRIMAVERA ARÁBE--------------------------------------------------------------------------
+
+
+#------------------------------------------------------INICIO GUERRA DO GOLFO--------------------------------------------------------------------------
+
+
+def plotar_guerra_golfo(dados):
+    st.subheader("Impacto da Guerra do Golfo no Preço do Petróleo Brent")
+    st.write("""
+        A Guerra do Golfo, ocorrida entre 1990 e 1991, foi um conflito de curta duração, mas de grande impacto global, especialmente no mercado de petróleo. Este gráfico ilustra a evolução dos preços do petróleo Brent durante a guerra, destacando eventos cruciais que influenciaram esses preços. Vamos explorar como esses eventos moldaram o mercado de petróleo e as economias globais.
+    """)
+
+    st.write("""
+        **Contexto Histórico:**
+
+        1. **Invasão do Kuwait (2 de agosto de 1990):**
+        
+        Em 2 de agosto de 1990, o Iraque, liderado por Saddam Hussein, invadiu o Kuwait, um dos maiores produtores de petróleo do mundo. Esta invasão não só provocou um aumento imediato nos preços do petróleo devido ao medo de uma interrupção significativa na oferta global, mas também gerou uma reação internacional que culminaria em um conflito militar.
+
+        2. **Início da Operação Tempestade no Deserto (17 de janeiro de 1991):**
+        
+        A resposta internacional veio na forma de uma coalizão liderada pelos Estados Unidos, que iniciou a Operação Tempestade no Deserto em 17 de janeiro de 1991. Esta operação tinha como objetivo liberar o Kuwait e proteger os interesses petrolíferos na região. Durante este período, a incerteza continuou a manter os preços do petróleo elevados.
+
+        3. **Fim da Guerra do Golfo (28 de fevereiro de 1991):**
+        
+        A guerra terminou oficialmente em 28 de fevereiro de 1991, quando as forças da coalizão declararam a libertação do Kuwait. Com o fim do conflito, houve uma expectativa de estabilização na produção e fornecimento de petróleo, o que levou a uma diminuição gradual nos preços.
+    """)
+
+    
+    dados_golfo = dados[(dados['Data'] >= '1990-01-01') & (dados['Data'] <= '1991-12-31')]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=dados_golfo['Data'], y=dados_golfo['Preco_petroleo_bruto_Brent_FOB'],
+                             mode='lines', name='Preço do Brent (FOB)', line=dict(color='blue')))
+
+    
+    eventos = [
+        {'data': '1990-08-02', 'evento': 'Invasão do Kuwait', 'cor': 'red'},
+        {'data': '1991-01-17', 'evento': 'Início da Operação Tempestade no Deserto', 'cor': 'green'},
+        {'data': '1991-02-28', 'evento': 'Fim da Guerra do Golfo', 'cor': 'purple'}
+    ]
+
+    for evento in eventos:
+        fig.add_shape(
+            type="line",
+            x0=evento['data'], y0=dados_golfo['Preco_petroleo_bruto_Brent_FOB'].min(),
+            x1=evento['data'], y1=dados_golfo['Preco_petroleo_bruto_Brent_FOB'].max(),
+            line=dict(color=evento['cor'], width=2, dash="dash")
+        )
+        fig.add_annotation(
+            x=evento['data'], y=dados_golfo['Preco_petroleo_bruto_Brent_FOB'].max(),
+            ax=0, ay=-30,
+            text=evento['evento'], showarrow=True, arrowhead=2,
+            arrowcolor=evento['cor'], arrowsize=1, arrowwidth=2,
+            font=dict(color=evento['cor'], size=12),
+            textangle=-45
+        )
+
+   
+    for evento in eventos:
+        fig.add_trace(go.Scatter(
+            x=[None], y=[None],
+            mode='lines',
+            line=dict(color=evento['cor'], dash='dash'),
+            showlegend=True,
+            name=evento['evento']
+        ))
+
+    fig.update_layout(
+        title='Impacto da Guerra do Golfo no Preço do Petróleo Brent',
+        xaxis_title='Data',
+        yaxis_title='Preço (USD)',
+        height=600,
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.3,
+            xanchor="center",
+            x=0.5,
+            itemwidth=50, 
+            font=dict(size=10)
+        ),
+        margin=dict(b=100)  
+    )
+
+    st.plotly_chart(fig)
+
+    csv = dados_golfo.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name='impacto_guerra_golfo_preco_petroleo_brent.csv',
+        mime='text/csv',
+    )
+
+def plotar_volatilidade_guerra_golfo(dados):
+    st.subheader("Volatilidade dos Preços do Petróleo Durante a Guerra do Golfo")
+    st.write("""
+        Este gráfico mostra a volatilidade dos preços do petróleo Brent durante a Guerra do Golfo.
+    """)
+
+    dados_golfo = dados[(dados['Data'] >= '1990-01-01') & (dados['Data'] <= '1991-12-31')]
+    dados_golfo['Retornos_Diarios'] = dados_golfo['Preco_petroleo_bruto_Brent_FOB'].pct_change()
+    dados_golfo['Volatilidade'] = dados_golfo['Retornos_Diarios'].rolling(window=30).std()
+
+    fig = px.line(dados_golfo, x='Data', y='Volatilidade', title='Volatilidade dos Preços do Petróleo Brent Durante a Guerra do Golfo')
+    fig.update_xaxes(title_text='Data')
+    fig.update_yaxes(title_text='Volatilidade (30 dias)')
+    st.plotly_chart(fig)
+
+    csv = dados_golfo[['Data', 'Volatilidade']].dropna().to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name='volatilidade_guerra_golfo.csv',
+        mime='text/csv',
+    )
+
 #------------------------------------------------------INICIO FIM--------------------------------------------------------------------------
 
 #------------------------------------------------------INICIO AUMENTOS--------------------------------------------------------------------------
@@ -715,20 +1020,53 @@ def aumentos(dados):
 
     if submenu == "Primavera Árabe":
         st.title("Primavera Árabe")
-        st.write("""
-            A Primavera Árabe, que começou em 2010, teve impactos significativos em diversas economias, 
+        st.write(""" 
+                 A Primavera Árabe, que começou em 2010, teve impactos significativos em diversas economias, 
             especialmente em países exportadores de petróleo no Oriente Médio e Norte da África. 
+            Teve início na Tunísia em dezembro de 2010 e rapidamente se espalhou para países como Egito, Líbia, Síria, Iémen e Bahrein. Os protestos eram, em sua maioria, contra regimes autoritários e a favor de reformas políticas, econômicas e sociais.                    
+            Muitos desses países são grandes produtores e exportadores de petróleo, e as tensões políticas e sociais ameaçaram interromper a produção e a exportação desse recurso vital.
+            
+            Preço do Petróleo:
+            Os levantes e a instabilidade política resultante provocaram um aumento na incerteza global em relação à oferta de petróleo, o que fez os preços subirem significativamente. Em 2011, por exemplo, o preço do barril de petróleo Brent subiu de aproximadamente 90 dollars para 125 dollars.
+            Os mercados temeram que a instabilidade pudesse afetar os principais pontos de produção e transporte de petróleo, levando a uma possível escassez no fornecimento global.
+            
+            Interrupção da produção:
+            Na Líbia, um dos países mais afetados, a guerra civil que seguiu a queda do líder Muammar Gaddafi em 2011 reduziu drasticamente a produção de petróleo. A produção, que estava em cerca de 1,6 milhão de barris por dia antes da revolução, caiu para quase zero durante o conflito.
+            No Iémen, os combates e a instabilidade também afetaram a produção de petróleo e gás, reduzindo a capacidade do país de exportar esses recursos.
+            
+            Reajuste nas políticas energéticas:
+            A instabilidade gerada pela Primavera Árabe levou muitos países consumidores de petróleo a reavaliar suas políticas energéticas e a buscar maior segurança energética por meio da diversificação de fontes e fornecedores .
+            Países como os Estados Unidos aumentaram o foco na produção doméstica de petróleo e gás, contribuindo para a expansão do fracking e da produção de petróleo de xisto.
+            
+            Mudança no Poder Geopolítico:
+            A Primavera Árabe alterou significativamente o equilíbrio de poder no Oriente Médio e no Norte da África. Novos governos emergiram em alguns países, enquanto outros entraram em prolongados períodos de conflito civil e instabilidade política.
+            Essas mudanças políticas afetaram a OPEP (Organização dos Países Exportadores de Petróleo) e sua capacidade de coordenar políticas de produção e preços entre seus membros, dada a instabilidade em países como Líbia e Iémen .
+            
+            Oportunidade para novos produtores:
+            A instabilidade nos países da Primavera Árabe permitiu que outros grandes produtores de petróleo, como Arábia Saudita e Rússia, aumentassem sua influência nos mercados globais de energia.
+            A Arábia Saudita, por exemplo, aumentou sua produção de petróleo para compensar as perdas de produção em países afetados pela Primavera Árabe, solidificando sua posição como líder de facto da OPEP. Alguns países começaram a investir mais em infraestrutura energética e em medidas de segurança para proteger suas instalações de petróleo e gás .
+            
+            Energias renováveis:
+            A volatilidade nos preços do petróleo durante e após a Primavera Árabe incentivou um maior interesse e investimento em energias renováveis e tecnologias de eficiência energética como uma forma de reduzir a dependência do petróleo importado.
+            A União Europeia e outros grandes consumidores de energia intensificaram seus esforços para aumentar a proporção de fontes de energia renovável em suas matrizes energéticas .
+            
+            Impacto Social e Econômico:
+            Os aumentos nos preços do petróleo devido à Primavera Árabe tiveram efeitos significativos nas economias globais, contribuindo para a inflação e aumentando os custos de transporte e produção de bens e serviços.
+            Nos países produtores afetados, a perda de receita do petróleo durante os conflitos teve graves consequências econômicas e sociais, exacerbando as crises humanitárias e as dificuldades econômicas .                        
             Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante esse período.
         """)
-        # Adicione análises e gráficos específicos para a Primavera Árabe aqui
+        plotar_primavera_arabe(dados)
+        plotar_comparacao_prepos_primavera_arabe(dados)
+        plotar_dispersao_retornos(dados)
+        
+        
+        
 
     elif submenu == "Guerra do Golfo":
         st.title("Guerra do Golfo")
-        st.write("""
-            A Guerra do Golfo de 1990-1991 causou um choque no mercado de petróleo devido à incerteza e à interrupção na produção. 
-            Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante e após o conflito.
-        """)
-        # Adicione análises e gráficos específicos para a Guerra do Golfo aqui
+        plotar_guerra_golfo(dados)
+        plotar_volatilidade_guerra_golfo(dados)
+        
 #------------------------------------------------------FIO AUMENTOS--------------------------------------------------------------------------
 
 def main():
