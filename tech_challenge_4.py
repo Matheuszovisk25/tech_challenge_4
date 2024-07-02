@@ -25,7 +25,6 @@ def buscar_noticias(api_key, query='petróleo', language='pt'):
     response = requests.get(url)
     if response.status_code == 200:
         artigos = response.json().get('articles')
-        # Filtra as notícias que mencionam petróleo no título ou na descrição
         artigos_filtrados = [
             artigo for artigo in artigos 
             if ('petróleo' in artigo['title'].lower() if artigo['title'] else False) or 
@@ -37,22 +36,39 @@ def buscar_noticias(api_key, query='petróleo', language='pt'):
     
 #------------------------------------------------------INTRODUÇÃO--------------------------------------------------------------------------
 def introducao(dados):
-    """
-    Exibe a introdução da aplicação.
-    """
-    st.title("Introdução")
-    st.write(""" O petróleo é uma das commodities mais importantes do mundo, desempenhando um papel crucial na economia global. Ele é essencial não apenas como fonte de energia, mas também como matéria-prima para uma vasta gama de produtos, desde plásticos até produtos químicos. A produção de petróleo é, portanto, um indicador vital de poder econômico e estabilidade para muitos países.\n   
-    A extração do petróleo envolve uma técnica de detonação de rochas com uma carga explosiva a uma profundidade específica, afim de identificar potencial reservas.\n
-    Com essa matéria prima é possível produzir diversos produtos essenciais como:\b
-    - Combustível: gasolina, disel e querosene\b
-    - Lubrificante: óleo e graxas\b
-    - Materiais: plásticos, asfalto e fibras sintéticas\b
-    - Produtos Químicos: solventes e fertilizantes""")    
-    st.write(""" Para poder medir a quantidade de extração dessa material é utilizada uma medida comumente usada na indústria petrolífera para quantificar o volume de petrólio bruto, sendo essa unidade chamada que "barril de petróleo" que equivale a 159 litros. Contudo a conversão exata de 1 barril é de 42 galões americanos que é exatamente 3,78541 litros. \n
-    Portanto o cálculo é exatamente 42 galões americanos x 3,78541 litros = galão 159 litros.""")
-    st.write(""" Para promover a elaboração de políticas sólidas, mercados eficientes e a compreensão pública da energia e da sua interação com a economia e o ambiente, a instituição "EIA.gov" recolhe, analisa e divulga informações energéticas e disponibiliza em seu site com ampla gama de informações como produção de energia, estoques, demanda, importações, exportações e preços que é o assunto principal da nossa consultoria.\n
-    Nossos dashboard é interativo com insights relevantes para colaborar na tomada de decisão com a análise do preço petróleo brent, além de nosso modelo de Machine Learning com o Forecasting dos custos com base no histórico de preços apresentado no site EIA.gov "Energy Information Administration.\n
-    Para facilitar na compreensão da nossa consultoria apresentarmos-ei os momentos das crises econômicas e as demandas globais do petróleo que diretamente influenciam na alta e baixa dos custos referente ao barril.""")
+    st.title("Análise do Preço do Petróleo Brent")
+
+    st.markdown("""
+    <div style= padding: 15px; ">
+        <h2 style="text-align: center;">Introdução</h2>
+        <p style="text-align: justify;">
+            O petróleo é uma das commodities mais importantes do mundo, desempenhando um papel crucial na economia global. Ele é essencial não apenas como fonte de energia, mas também como matéria-prima para uma vasta gama de produtos, desde plásticos até produtos químicos. A produção de petróleo é, portanto, um indicador vital de poder econômico e estabilidade para muitos países.
+        </p>
+        <p style="text-align: justify;">
+            A extração do petróleo envolve uma técnica de detonação de rochas com uma carga explosiva a uma profundidade específica, afim de identificar potencial reservas. Com essa matéria-prima, é possível produzir diversos produtos essenciais como:
+        </p>
+        <ul>
+            <li>⛽ Combustível: gasolina, diesel e querosene</li>
+            <li>🛢️ Lubrificante: óleo e graxas</li>
+            <li>🏗️ Materiais: plásticos, asfalto e fibras sintéticas</li>
+            <li>🧪 Produtos Químicos: solventes e fertilizantes</li>
+        </ul>
+        <p style="text-align: justify;">
+            Para poder medir a quantidade de extração dessa material é utilizada uma medida comumente usada na indústria petrolífera para quantificar o volume de petróleo bruto, sendo essa unidade chamada que "barril de petróleo" que equivale a 159 litros. Contudo a conversão exata de 1 barril é de 42 galões americanos que é exatamente 3,78541 litros. Portanto o cálculo é exatamente 42 galões americanos x 3,78541 litros = galão 159 litros.
+        </p>
+        <p style="text-align: justify;">
+            Para promover a elaboração de políticas sólidas, mercados eficientes e a compreensão pública da energia e da sua interação com a economia e o ambiente, a instituição "EIA.gov" recolhe, analisa e divulga informações energéticas e disponibiliza em seu site com ampla gama de informações como produção de energia, estoques, demanda, importações, exportações e preços que é o assunto principal da nossa consultoria.
+        </p>
+        <p style="text-align: justify;">
+            Nosso dashboard é interativo com insights relevantes para colaborar na tomada de decisão com a análise do preço do petróleo Brent, além de nosso modelo de Machine Learning com o Forecasting dos custos com base no histórico de preços apresentado no site EIA.gov "Energy Information Administration.
+        </p>
+        <p style="text-align: justify;">
+            Para facilitar a compreensão da nossa consultoria, apresentamos os momentos das crises econômicas e as demandas globais do petróleo que diretamente influenciam na alta e baixa dos custos referente ao barril.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+   
 
     fig = go.Figure()
 
@@ -355,7 +371,6 @@ def plotar_impacto_covid(dados):
                       yaxis_title='Preço (USD)')
     st.plotly_chart(fig)
 
-    # Permite o download dos dados filtrados da COVID-19 como CSV
     csv = dados_covid.to_csv(index=False).encode('utf-8')
     st.download_button(
         label="Baixar dados como CSV",
@@ -750,11 +765,28 @@ def quedas(dados):
 
 
 def plotar_primavera_arabe(dados):
-    st.subheader("Impacto da Primavera Árabe no Preço do Petróleo Brent")
-    st.write("""
-        A Primavera Árabe foi uma série de protestos e levantes que ocorreram no Oriente Médio e no Norte da África a partir de 2010.
-        Esses eventos tiveram um impacto significativo no mercado global de petróleo, causando aumentos nos preços devido à instabilidade política.
-    """)
+    st.markdown("""
+    <div class="section-container">
+        <h2>Impacto da Primavera Árabe no Preço do Petróleo Brent</h2>
+        <p>
+            A Primavera Árabe, que começou em 2010, teve impactos significativos nas economias do Oriente Médio e Norte da África. Esses eventos aumentaram a incerteza global sobre a oferta de petróleo, elevando os preços de aproximadamente 90 para 125 dólares por barril em 2011.
+        </p>
+        <p>
+            A instabilidade política resultou em:
+        </p>
+        <ul>
+            <li>Interrupção da produção na Líbia e Iémen, reduzindo drasticamente a capacidade de exportação.</li>
+            <li>Reajustes nas políticas energéticas, com países como os EUA aumentando a produção doméstica.</li>
+            <li>Mudanças no poder geopolítico, afetando a capacidade da OPEP de coordenar políticas de produção.</li>
+            <li>Oportunidades para novos produtores, como Arábia Saudita e Rússia, aumentarem sua influência.</li>
+            <li>Maior investimento em energias renováveis e tecnologias de eficiência energética.</li>
+            <li>Impactos econômicos globais, como inflação e aumento nos custos de transporte e produção.</li>
+        </ul>
+        <p>
+            Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante esse período.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
     dados_arabe = dados[(dados['Data'] >= '2010-01-01') & (dados['Data'] <= '2013-12-31')]
 
@@ -778,11 +810,9 @@ def plotar_primavera_arabe(dados):
         )
         fig.add_annotation(
             x=evento['data'], y=dados_arabe['Preco_petroleo_bruto_Brent_FOB'].max(),
-            ax=0, ay=-30,
-            text=evento['evento'], showarrow=True, arrowhead=2,
-            arrowcolor=evento['cor'], arrowsize=1, arrowwidth=2,
+            text=evento['evento'], showarrow=True, arrowhead=1,
             font=dict(color=evento['cor'], size=12),
-            textangle=-45
+            textangle=-65
         )
 
     for evento in eventos:
@@ -818,40 +848,6 @@ def plotar_primavera_arabe(dados):
         label="Baixar dados como CSV",
         data=csv,
         file_name='impacto_primavera_arabe_preco_petroleo_brent.csv',
-        mime='text/csv',
-    )
-
-def plotar_comparacao_prepos_primavera_arabe(dados):
-    st.subheader("Comparação de Preços Antes e Depois da Primavera Árabe")
-    st.write("""
-        Este gráfico compara os preços do petróleo Brent antes, durante e depois da Primavera Árabe, destacando o impacto dos eventos nos preços.
-    """)
-
-    
-    pre_arabe = dados[(dados['Data'] >= '2008-01-01') & (dados['Data'] < '2010-01-01')]
-    durante_arabe = dados[(dados['Data'] >= '2010-01-01') & (dados['Data'] < '2012-01-01')]
-    pos_arabe = dados[(dados['Data'] >= '2012-01-01') & (dados['Data'] <= '2014-12-31')]
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Box(y=pre_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Antes da Primavera Árabe (2008-2009)', marker_color='blue'))
-    fig.add_trace(go.Box(y=durante_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Durante a Primavera Árabe (2010-2011)', marker_color='red'))
-    fig.add_trace(go.Box(y=pos_arabe['Preco_petroleo_bruto_Brent_FOB'], name='Após a Primavera Árabe (2012-2014)', marker_color='green'))
-
-    fig.update_layout(
-        title='Comparação de Preços do Petróleo Brent Antes, Durante e Após a Primavera Árabe',
-        yaxis_title='Preço (USD)',
-        boxmode='group'
-    )
-
-    st.plotly_chart(fig)
-
-    dados_comparacao = pd.concat([pre_arabe, durante_arabe, pos_arabe])
-    csv = dados_comparacao.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="Baixar dados como CSV",
-        data=csv,
-        file_name='comparacao_prepos_primavera_arabe.csv',
         mime='text/csv',
     )
 
@@ -1020,41 +1016,6 @@ def aumentos(dados):
 
     if submenu == "Primavera Árabe":
         st.title("Primavera Árabe")
-        st.write(""" 
-                 A Primavera Árabe, que começou em 2010, teve impactos significativos em diversas economias, 
-            especialmente em países exportadores de petróleo no Oriente Médio e Norte da África. 
-            Teve início na Tunísia em dezembro de 2010 e rapidamente se espalhou para países como Egito, Líbia, Síria, Iémen e Bahrein. Os protestos eram, em sua maioria, contra regimes autoritários e a favor de reformas políticas, econômicas e sociais.                    
-            Muitos desses países são grandes produtores e exportadores de petróleo, e as tensões políticas e sociais ameaçaram interromper a produção e a exportação desse recurso vital.
-            
-            Preço do Petróleo:
-            Os levantes e a instabilidade política resultante provocaram um aumento na incerteza global em relação à oferta de petróleo, o que fez os preços subirem significativamente. Em 2011, por exemplo, o preço do barril de petróleo Brent subiu de aproximadamente 90 dollars para 125 dollars.
-            Os mercados temeram que a instabilidade pudesse afetar os principais pontos de produção e transporte de petróleo, levando a uma possível escassez no fornecimento global.
-            
-            Interrupção da produção:
-            Na Líbia, um dos países mais afetados, a guerra civil que seguiu a queda do líder Muammar Gaddafi em 2011 reduziu drasticamente a produção de petróleo. A produção, que estava em cerca de 1,6 milhão de barris por dia antes da revolução, caiu para quase zero durante o conflito.
-            No Iémen, os combates e a instabilidade também afetaram a produção de petróleo e gás, reduzindo a capacidade do país de exportar esses recursos.
-            
-            Reajuste nas políticas energéticas:
-            A instabilidade gerada pela Primavera Árabe levou muitos países consumidores de petróleo a reavaliar suas políticas energéticas e a buscar maior segurança energética por meio da diversificação de fontes e fornecedores .
-            Países como os Estados Unidos aumentaram o foco na produção doméstica de petróleo e gás, contribuindo para a expansão do fracking e da produção de petróleo de xisto.
-            
-            Mudança no Poder Geopolítico:
-            A Primavera Árabe alterou significativamente o equilíbrio de poder no Oriente Médio e no Norte da África. Novos governos emergiram em alguns países, enquanto outros entraram em prolongados períodos de conflito civil e instabilidade política.
-            Essas mudanças políticas afetaram a OPEP (Organização dos Países Exportadores de Petróleo) e sua capacidade de coordenar políticas de produção e preços entre seus membros, dada a instabilidade em países como Líbia e Iémen .
-            
-            Oportunidade para novos produtores:
-            A instabilidade nos países da Primavera Árabe permitiu que outros grandes produtores de petróleo, como Arábia Saudita e Rússia, aumentassem sua influência nos mercados globais de energia.
-            A Arábia Saudita, por exemplo, aumentou sua produção de petróleo para compensar as perdas de produção em países afetados pela Primavera Árabe, solidificando sua posição como líder de facto da OPEP. Alguns países começaram a investir mais em infraestrutura energética e em medidas de segurança para proteger suas instalações de petróleo e gás .
-            
-            Energias renováveis:
-            A volatilidade nos preços do petróleo durante e após a Primavera Árabe incentivou um maior interesse e investimento em energias renováveis e tecnologias de eficiência energética como uma forma de reduzir a dependência do petróleo importado.
-            A União Europeia e outros grandes consumidores de energia intensificaram seus esforços para aumentar a proporção de fontes de energia renovável em suas matrizes energéticas .
-            
-            Impacto Social e Econômico:
-            Os aumentos nos preços do petróleo devido à Primavera Árabe tiveram efeitos significativos nas economias globais, contribuindo para a inflação e aumentando os custos de transporte e produção de bens e serviços.
-            Nos países produtores afetados, a perda de receita do petróleo durante os conflitos teve graves consequências econômicas e sociais, exacerbando as crises humanitárias e as dificuldades econômicas .                        
-            Vamos analisar como esses eventos afetaram os preços do petróleo Brent durante esse período.
-        """)
         plotar_primavera_arabe(dados)
         plotar_comparacao_prepos_primavera_arabe(dados)
         plotar_dispersao_retornos(dados)
