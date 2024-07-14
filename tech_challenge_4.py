@@ -8,7 +8,7 @@ from api_key import NEWS_API_KEY
 import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
 import joblib
-import datetime
+from datetime import datetime
 from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.arima.model import ARIMA
 import numpy as np
@@ -146,6 +146,7 @@ def conclusao():
         A Primavera Árabe teve um impacto profundo e duradouro no mercado de petróleo e na geopolítica do Oriente Médio e do Norte da África. As interrupções na produção e os aumentos nos preços do petróleo destacaram a vulnerabilidade da economia global às crises regionais em áreas ricas em recursos energéticos. Esse período tumultuado sublinhou a necessidade de diversificação energética e de investimentos em infraestrutura para mitigar os riscos associados à dependência do petróleo de regiões instáveis.\n
         
         """)
+    
 
 def exibir(dados):
     st.title("Análise do Preço do Petróleo Brent")
@@ -882,6 +883,7 @@ def aumentos(dados):
         plotar_guerra_golfo(dados)
         plotar_volatilidade_guerra_golfo(dados)
 
+
 def criar_grafico_previsoes():
     st.subheader("Previsão de Preços do Petróleo Brent")
 
@@ -897,6 +899,16 @@ def criar_grafico_previsoes():
 
     # Filtrar previsões a partir de 21 de maio de 2024
     dados_previsao = dados_filtrados[dados_filtrados['Data'] > '2024-05-20']
+
+    # Obter o valor previsto no gráfico a partir da data atual
+    data_atual = datetime.now()
+    data_str = data_atual.strftime('%Y-%m-%d')
+    valor_previsto = dados_previsao[dados_previsao['Data'] == data_str]['Preco'].values
+
+    if len(valor_previsto) > 0:
+        valor_previsto = valor_previsto[0]
+    else:
+        valor_previsto = "N/A"
 
     # Plotar os dados com Plotly
     fig = go.Figure()
@@ -921,6 +933,15 @@ def criar_grafico_previsoes():
 
     # Exibir as previsões
     st.write(dados_previsao.head())
+
+    # Obter e exibir o preço atual do petróleo Brent
+    preco_atual = obter_preco_atual()
+    
+    # Display metrics
+    col1, col2 = st.columns(2)
+    col1.metric(label="Preço Atual do Petróleo Brent (USD)", value=preco_atual)
+    col2.metric(label="Valor Previsto no Gráfico (USD)", value=valor_previsto)
+
 
    
 def main():
