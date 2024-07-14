@@ -6,4 +6,5 @@ plotly
 requests
 streamlit
 streamlit-option-menu
+joblib
 
