@@ -13,6 +13,7 @@ from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.arima.model import ARIMA
 import numpy as np
 
+
 def obter_preco_atual():
     url = "https://www.google.com/search?q=cota%C3%A7%C3%A3o+petroleo+brent"
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"}
@@ -44,6 +45,8 @@ def buscar_noticias(api_key, query='petróleo', language='pt'):
         return artigos_filtrados
     else:
         return None
+
+#------------------------------------------------------INTRODUÇÃO--------------------------------------------------------------------------
 
 def introducao(dados):
     st.title("Análise do Preço do Petróleo Brent")
@@ -133,20 +136,36 @@ def introducao(dados):
 
     st.plotly_chart(fig)
 
+#------------------------------------------------------FIM INTRODUÇÃO--------------------------------------------------------------------------
+
+
+#------------------------------------------------------CONCLUSÃO--------------------------------------------------------------------------
+
 def conclusao():
     st.title("Conclusão")
-    st.write("""
-        Obrigado por usar nossa aplicação para analisar os preços do petróleo Brent, esperamos que tenha encontrado as informações úteis.\b
-        Se tiver alguma dúvida ou sugestão, por favor, entre em contato.\n
-        O petróleo é um recurso natural de extrema importância, tanto histórica quanto economicamente, mas que também apresenta grandes desafios ambientais.\b 
-        O futuro da energia deve equilibrar a demanda por combustíveis com a necessidade de práticas sustentáveis.\n
-        Fatores como geopolítica, crises econômicas, demanda global por energia e outras situações influenciam no preço do barril do petróleo. Com dados histórico é possível criar uma análise e ter insights, afim de poder avaliar e escolher a melhor resolução para deliberação financeiras dentro de uma empresa.\n 
-        A Guerra do Golfo de 1990-1991 não só alterou drasticamente o cenário político e econômico do Oriente Médio, mas também teve implicações globais significativas, desde o impacto sobre os preços do petróleo até mudanças nas políticas de segurança internacional. O conflito exemplificou as complexidades das relações internacionais e a volatilidade das questões de energia e soberania no mundo contemporâneo.\n        
-        A Revolução Iraniana de 1979 não apenas transformou o Irã, mas também teve um impacto profundo e duradouro no mercado global de petróleo, nas relações internacionais e na geopolítica do Oriente Médio. A crise resultante sublinhou a importância da estabilidade regional e a vulnerabilidade das economias globais às flutuações nos mercados de energia, destacando a interconexão entre política, economia e recursos naturais no mundo contemporâneo.\n
-        A Primavera Árabe teve um impacto profundo e duradouro no mercado de petróleo e na geopolítica do Oriente Médio e do Norte da África. As interrupções na produção e os aumentos nos preços do petróleo destacaram a vulnerabilidade da economia global às crises regionais em áreas ricas em recursos energéticos. Esse período tumultuado sublinhou a necessidade de diversificação energética e de investimentos em infraestrutura para mitigar os riscos associados à dependência do petróleo de regiões instáveis.\n
-        
-        """)
-    
+    st.markdown("""
+<h2>Conclusão</h2>
+<p style="text-align: justify;">
+Neste trabalho, desenvolvemos uma análise abrangente do preço do petróleo Brent, utilizando diversas técnicas e abordagens para fornecer insights valiosos sobre a dinâmica do mercado de petróleo. Utilizamos dados históricos para entender as tendências passadas e identificar eventos significativos que influenciaram os preços, como a pandemia de COVID-19, conflitos geopolíticos e crises financeiras.
+</p>
+<p style="text-align: justify;">
+Empregamos técnicas de web scraping para coletar os dados mais recentes do preço atual do petróleo Brent, permitindo uma comparação em tempo real com as previsões geradas por nosso modelo de machine learning. Essa abordagem nos permitiu avaliar a precisão de nossas previsões e ajustar nossos modelos conforme necessário.
+</p>
+<p style="text-align: justify;">
+Embora tenhamos encontrado desafios técnicos, como problemas de compatibilidade entre a biblioteca Prophet e NumPy, conseguimos documentar nossas análises e previsões no notebook anexado. Este notebook está disponível para download e contém todas as etapas e resultados detalhados de nossa análise com o Prophet.
+</p>
+<p style="text-align: justify;">
+A combinação de dados históricos, preços atuais e previsões futuras nos forneceu uma visão abrangente do mercado de petróleo, permitindo a elaboração de estratégias mais informadas e a mitigação de riscos.
+</p>
+<p style="text-align: justify;">
+Agradecemos pela atenção e esperamos que as informações e análises apresentadas sejam úteis para seus objetivos. Se houver dúvidas ou sugestões, estamos à disposição para ajudar.
+</p>
+<p style="text-align: center;">
+Você pode acessar nosso <a href="https://github.com/seu-usuario" target="_blank">GitHub</a> e nosso <a href="https://www.linkedin.com/in/seu-usuario" target="_blank">LinkedIn</a> para mais informações e contato.
+</p>
+""", unsafe_allow_html=True)
+
+ #------------------------------------------------------FIM CONCLUSÃO--------------------------------------------------------------------------   
 
 def exibir(dados):
     st.title("Análise do Preço do Petróleo Brent")
@@ -887,20 +906,25 @@ def aumentos(dados):
 def criar_grafico_previsoes():
     st.subheader("Previsão de Preços do Petróleo Brent")
 
-    # Carregar dados a partir do novo arquivo CSV
+    st.markdown("""
+<h2>Análise do Preço Atual e Previsão do Petróleo Brent</h2>
+<p style="text-align: justify;">
+Atualmente, o preço do petróleo Brent está em um nível significativo, refletindo uma combinação de fatores econômicos, geopolíticos e ambientais que influenciam o mercado global de energia. 
+</p>
+<p style="text-align: justify;">
+Observando o gráfico de preços do petróleo Brent, notamos uma trajetória que revela períodos de alta volatilidade. Eventos como a pandemia de COVID-19, conflitos geopolíticos e mudanças nas políticas da OPEP (Organização dos Países Exportadores de Petróleo) têm desempenhado papéis significativos nas flutuações dos preços. Por exemplo, a pandemia resultou em uma drástica queda na demanda e, consequentemente, nos preços do petróleo, enquanto a recuperação econômica subsequente levou a um aumento nos preços.
+</p>
+<p style="text-align: justify;">
+As previsões de preços do petróleo Brent até maio de 2025, indicadas pela linha vermelha no gráfico, oferecem uma visão prospectiva baseada em modelos de machine learning. Esta previsão considera dados históricos e padrões identificados no comportamento do mercado, projetando possíveis movimentos futuros.
+</p>
+""", unsafe_allow_html=True)
+
     dados = pd.read_csv('Filtered_DataFrame_2020-2025.csv')
     dados['Data'] = pd.to_datetime(dados['Data'])
 
-    # Filtrar dados para o período de 2020 até 20 de maio de 2025
     dados_filtrados = dados[(dados['Data'] >= '2020-01-01') & (dados['Data'] <= '2025-05-20')]
-
-    # Filtrar dados históricos até 20 de maio de 2024
     dados_historicos = dados_filtrados[dados_filtrados['Data'] <= '2024-05-20']
-
-    # Filtrar previsões a partir de 21 de maio de 2024
     dados_previsao = dados_filtrados[dados_filtrados['Data'] > '2024-05-20']
-
-    # Obter o valor previsto no gráfico a partir da data atual
     data_atual = datetime.now()
     data_str = data_atual.strftime('%Y-%m-%d')
     valor_previsto = dados_previsao[dados_previsao['Data'] == data_str]['Preco'].values
@@ -910,16 +934,10 @@ def criar_grafico_previsoes():
     else:
         valor_previsto = "N/A"
 
-    # Plotar os dados com Plotly
     fig = go.Figure()
-
-    # Histórico
     fig.add_trace(go.Scatter(x=dados_historicos['Data'], y=dados_historicos['Preco'], mode='lines', name='Histórico', line=dict(color='blue')))
-
-    # Previsão
     fig.add_trace(go.Scatter(x=dados_previsao['Data'], y=dados_previsao['Preco'], mode='lines', name='Previsão', line=dict(color='red')))
 
-    # Conectar ponto final do histórico ao ponto inicial da previsão
     if not dados_historicos.empty and not dados_previsao.empty:
         fig.add_trace(go.Scatter(x=[dados_historicos['Data'].iloc[-1], dados_previsao['Data'].iloc[0]],
                                  y=[dados_historicos['Preco'].iloc[-1], dados_previsao['Preco'].iloc[0]],
@@ -930,20 +948,30 @@ def criar_grafico_previsoes():
                       yaxis_title='Preço (FOB)')
 
     st.plotly_chart(fig)
-
-    # Exibir as previsões
-    st.write(dados_previsao.head())
-
-    # Obter e exibir o preço atual do petróleo Brent
     preco_atual = obter_preco_atual()
     
-    # Display metrics
+    st.markdown("""
+    <p style="text-align: justify;">
+    Utilizamos técnicas de web scraping para coletar os dados mais recentes do preço atual do petróleo Brent. Em seguida, comparamos esses dados com as previsões geradas pelo nosso modelo.
+    </p>
+    """, unsafe_allow_html=True)
+
     col1, col2 = st.columns(2)
     col1.metric(label="Preço Atual do Petróleo Brent (USD)", value=preco_atual)
     col2.metric(label="Valor Previsto no Gráfico (USD)", value=valor_previsto)
 
+    st.subheader("Prophet")
 
-   
+    st.markdown("""
+    <p style="text-align: justify;">
+    Utilizamos um modelo Prophet também, mas devido a alguns erros de compatibilidade entre a biblioteca Prophet e a biblioteca NumPy, não conseguimos utilizar esses modelos diretamente no Streamlit. No entanto, todas as análises e previsões realizadas com o Prophet estão disponíveis no nosso notebook. Você pode baixar o arquivo do notebook clicando no botão abaixo.
+    </p>
+    """, unsafe_allow_html=True)
+
+    with open("ml_prophet.ipynb", "rb") as file:
+        st.download_button(label="Baixar Notebook", data=file, file_name="notebook_projetos_analises.ipynb")
+
+  
 def main():
     st.set_page_config(page_title="Análise do Preço do Petróleo Brent", layout="wide")
     caminho_arquivo = 'petroleo.xlsx'
