@@ -7,11 +7,8 @@ import requests
 from api_key import NEWS_API_KEY
 import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
-import joblib
 from datetime import datetime
-from sklearn.linear_model import LinearRegression
-from statsmodels.tsa.arima.model import ARIMA
-import numpy as np
+
 
 
 def obter_preco_atual():
